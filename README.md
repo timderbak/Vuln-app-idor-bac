@@ -1,126 +1,234 @@
-# 🏥 VurnApp — Vulnerable Medical API (IDOR & BAC)
+# 🏥 VurnApp — Уязвимое медицинское API (IDOR & BAC)
 
-A **deliberately vulnerable** FastAPI application simulating a medical clinic management system. Built for learning and practicing **IDOR (Insecure Direct Object Reference)** and **BAC (Broken Access Control)** vulnerability detection and exploitation.
+**Намеренно уязвимое** FastAPI-приложение, имитирующее систему управления медицинской клиникой. Создано для обучения и практики обнаружения и эксплуатации уязвимостей **IDOR (Insecure Direct Object Reference)** и **BAC (Broken Access Control)**.
 
-> ⚠️ **WARNING**: This application contains intentional security vulnerabilities. **DO NOT deploy in production.** Use only in isolated lab environments for educational purposes.
+> ⚠️ **ВНИМАНИЕ**: Это приложение содержит преднамеренные уязвимости безопасности. **НЕ запускайте в продакшене.** Используйте только в изолированных лабораторных средах в образовательных целях.
 
-## 🎯 Purpose
+---
 
-This project provides a realistic medical API with **20+ intentional vulnerabilities** across multiple categories, designed as a hands-on training lab for:
+## 🎯 Назначение
 
-- Security researchers & bug bounty hunters
-- Penetration testers
-- AppSec engineers
-- Students learning web application security
+Проект предоставляет реалистичное медицинское API с **22+ преднамеренными уязвимостями** разных категорий. Предназначен как практическая лаборатория для:
 
-## 🔓 Vulnerability Categories
+- 🔍 Исследователей безопасности и багхантеров  
+- 🛡️ Пентестеров  
+- 🛠️ AppSec-инженеров  
+- 🎓 Студентов, изучающих безопасность веб-приложений  
+- 🤖 Тестирования IDOR/BAC-сканеров и инструментов автоматизации
 
-| Category | Code | Description | Count |
-|----------|------|-------------|-------|
-| **IDOR** | I1–I11 | Horizontal & vertical object reference flaws | 11 |
-| **Broken Access Control** | B1–B11 | Missing auth, role checks, mass assignment | 11 |
+---
 
-### IDOR Vulnerabilities (I1–I11)
-- **Horizontal IDOR**: Access other users' profiles, appointments, prescriptions, medical records
-- **Vertical IDOR**: Patients accessing doctor/admin-only endpoints
-- **ID Enumeration**: Sequential IDs exposed in responses
-- **File Access IDOR**: Download any patient's medical files
+## 🏗️ Стек технологий
 
-### Broken Access Control (B1–B11)
-- **Missing function-level checks**: Endpoints accessible without proper role verification
-- **Mass assignment**: Role escalation via registration/update endpoints
-- **Method-based bypass**: DELETE without authentication while GET requires it
-- **Parameter tampering**: Creating resources on behalf of other users
-- **Missing authentication**: Admin endpoints without any auth
+| Компонент | Технология |
+|-----------|-----------|
+| **Фреймворк** | FastAPI 0.104 |
+| **База данных** | SQLite (через SQLAlchemy 2.0) |
+| **Аутентификация** | JWT Bearer-токены + API Key |
+| **Хеширование паролей** | passlib + bcrypt |
+| **Python** | 3.9+ |
 
-## 🏗️ Tech Stack
+---
 
-- **Framework**: FastAPI 0.104
-- **Database**: SQLite (via SQLAlchemy 2.0)
-- **Auth**: JWT Bearer tokens + API Key authentication
-- **Password hashing**: passlib + bcrypt
-- **Python**: 3.9+
-
-## 🚀 Quick Start
+## 🚀 Быстрый старт
 
 ```bash
-# Clone the repository
+# Клонировать репозиторий
 git clone https://github.com/timderbak/Vurn-app-idor-bac.git
 cd Vurn-app-idor-bac
 
-# Create virtual environment and install dependencies
+# Создать виртуальное окружение и установить зависимости
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 
-# Run the server
+# Запустить сервер
 uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
-The database is automatically seeded on first launch with test data.
+База данных автоматически заполняется тестовыми данными при первом запуске.
 
-## 📚 API Documentation
+---
 
-Once running, visit:
-- **Swagger UI**: http://localhost:8000/docs
-- **ReDoc**: http://localhost:8000/redoc
+## 📚 Документация API
 
-## 👥 Test Accounts
+После запуска доступна по адресам:
 
-| Email | Password | Role |
-|-------|----------|------|
-| `john@patient.com` | `patient123` | patient |
-| `jane@patient.com` | `patient123` | patient |
-| `bob@patient.com` | `patient123` | patient |
-| `dr.smith@clinic.com` | `doctor123` | doctor |
-| `dr.jones@clinic.com` | `doctor123` | doctor |
-| `nurse.wilson@clinic.com` | `nurse123` | nurse |
-| `admin@clinic.com` | `admin123` | admin |
-| `reception@clinic.com` | `reception123` | receptionist |
+- **Swagger UI**: [http://localhost:8000/docs](http://localhost:8000/docs)  
+- **ReDoc**: [http://localhost:8000/redoc](http://localhost:8000/redoc)  
+- **Лендинг**: [http://localhost:8000/](http://localhost:8000/)
 
-## 🔑 Authentication
+---
 
-### JWT Token
+## 👥 Тестовые аккаунты
+
+| Email | Пароль | Роль | API Key |
+|-------|--------|------|---------|
+| `john@patient.com` | `patient123` | 🟢 patient | `pk_patient_john_123` |
+| `jane@patient.com` | `patient123` | 🟢 patient | `pk_patient_jane_456` |
+| `mike@patient.com` | `patient123` | 🟢 patient | `pk_patient_mike_789` |
+| `sarah@doctor.com` | `doctor123` | 🔵 doctor | `pk_doctor_sarah_111` |
+| `james@doctor.com` | `doctor123` | 🔵 doctor | `pk_doctor_james_222` |
+| `anna@nurse.com` | `nurse123` | 🟣 nurse | `pk_nurse_anna_333` |
+| `bob@nurse.com` | `nurse123` | 🟣 nurse | `pk_nurse_bob_444` |
+| `lisa@reception.com` | `reception123` | 🟡 receptionist | `pk_recep_lisa_555` |
+| `tom@reception.com` | `reception123` | 🟡 receptionist | `pk_recep_tom_666` |
+| `admin@clinic.com` | `admin123` | 🔴 admin | `pk_admin_root_777` |
+
+---
+
+## 🔑 Аутентификация
+
+### JWT-токен
+
 ```bash
-# Login to get a token
+# Логин — получить токен
 curl -X POST http://localhost:8000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"john@patient.com","password":"patient123"}'
 
-# Use the token
+# Использование токена
 curl http://localhost:8000/api/patients/ \
-  -H "Authorization: Bearer <your_token>"
+  -H "Authorization: Bearer <ваш_токен>"
 ```
 
 ### API Key
+
 ```bash
 curl http://localhost:8000/api/patients/ \
   -H "X-API-Key: pk_patient_john_123"
 ```
 
-## 📁 Project Structure
+---
+
+## 🔓 Карта уязвимостей
+
+### IDOR-уязвимости (I1–I11)
+
+| Код | Сложность | Эндпоинт | Описание |
+|-----|-----------|----------|----------|
+| **I1** | 🟢 Easy | `GET /api/patients/{id}` | **Горизонтальный IDOR** — пациент A может просматривать профиль пациента B, меняя ID |
+| **I2** | 🟢 Easy | `PUT /api/patients/{id}` | **Горизонтальный IDOR** — пациент A может редактировать профиль пациента B |
+| **I3** | 🟢 Easy | `GET /api/appointments/{id}` | **Горизонтальный IDOR** — просмотр чужих записей к врачу |
+| **I4** | 🟢 Easy | `DELETE /api/appointments/{id}` | **Горизонтальный IDOR** — отмена чужих записей к врачу |
+| **I5** | 🟢 Easy | `GET /api/prescriptions/{id}` | **Горизонтальный IDOR** — просмотр чужих рецептов |
+| **I6** | 🟢 Easy | `GET /api/records/{id}` | **Горизонтальный IDOR** — просмотр чужих медицинских записей |
+| **I7** | 🟡 Medium | `GET /api/files/{id}/download` | **IDOR файлов** — скачивание чужих медицинских документов |
+| **I8** | 🟡 Medium | `GET /api/prescriptions/?patient_id=X` | **IDOR через фильтр** — получение рецептов любого пациента через query-параметр |
+| **I9** | 🟡 Medium | `GET /api/records/?patient_id=X` | **IDOR через фильтр** — получение медкарт любого пациента через query-параметр |
+| **I10** | 🟢 Easy | `GET /api/admin/users/{id}` | **Вертикальный IDOR** — пациент получает доступ к админ-данным пользователей (включая API-ключи) |
+| **I11** | 🟢 Easy | `GET /api/patients/` | **Перечисление ID** — ответ содержит последовательные ID, позволяя перебирать объекты |
+
+### BAC-уязвимости (B1–B12)
+
+| Код | Сложность | Эндпоинт | Описание |
+|-----|-----------|----------|----------|
+| **B1** | 🟢 Easy | `GET /api/patients/` | **Отсутствие проверки роли** — любой аутентифицированный пользователь видит все профили пациентов |
+| **B2** | 🟢 Easy | `POST /api/prescriptions/` | **Отсутствие проверки роли** — пациент может создавать рецепты (должен только врач) |
+| **B3** | 🟢 Easy | `GET /api/admin/users` | **Forced browsing** — админ-эндпоинт вообще без аутентификации; утечка данных и API-ключей |
+| **B4** | 🟡 Medium | `GET /api/admin/stats` | **Weak API Key check** — принимает ЛЮБОЙ валидный API-ключ, а не только админский |
+| **B5** | 🟡 Medium | `POST /api/appointments/` | **Подмена параметров** — можно создать запись от имени другого пациента через `patient_id` |
+| **B6** | 🟡 Medium | `POST /api/records/` | **Подмена параметров** — создание медзаписи от имени другого врача |
+| **B7** | 🟢 Easy | `DELETE /api/files/{id}` | **Отсутствие аутентификации** — удаление файлов без авторизации (GET при этом требует токен) |
+| **B8** | 🟡 Medium | `PUT /api/prescriptions/{id}` | **Отсутствие проверки роли** — пациент может менять статус своего рецепта |
+| **B9** | 🟢 Easy | `POST /api/auth/register` | **Mass Assignment** — при регистрации можно передать `role: "admin"` и получить привилегии |
+| **B10** | 🟡 Medium | `PUT /api/patients/{id}` | **Mass Assignment** — через обновление профиля можно поменять `role` и `user_id` |
+| **B11** | 🟡 Medium | `GET /api/records/` | **Отсутствие проверки роли** — пациент видит ВСЕ медицинские записи системы |
+| **B12** | 🟡 Medium | `PUT /api/admin/users/{id}` | **Обход защиты** — `require_role_weak` содержит ошибку в сравнении регистра ролей |
+
+---
+
+## 📁 Структура проекта
 
 ```
 Vurn-app-idor-bac/
 ├── app/
-│   ├── main.py              # FastAPI app, lifespan, CORS
-│   ├── auth.py               # JWT + API Key authentication
+│   ├── __init__.py
+│   ├── main.py              # FastAPI-приложение, lifespan, CORS, лендинг
+│   ├── auth.py               # JWT + API Key аутентификация  
 │   ├── database.py           # SQLAlchemy engine & session
-│   ├── models.py             # ORM models (User, Patient, etc.)
-│   ├── seed.py               # Database seeding with test data
+│   ├── models.py             # ORM-модели (User, Patient, Appointment и т.д.)
+│   ├── seed.py               # Заполнение БД тестовыми данными
 │   └── routers/
-│       ├── auth_router.py    # Login, register, token refresh
-│       ├── patients.py       # Patient profile CRUD
-│       ├── appointments.py   # Appointment management
-│       ├── prescriptions.py  # Prescription management
-│       ├── medical_records.py # Medical record management
-│       ├── files.py          # File upload/download
-│       └── admin.py          # Admin panel endpoints
+│       ├── __init__.py
+│       ├── auth_router.py    # Логин, регистрация, обновление токена
+│       ├── patients.py       # CRUD профилей пациентов
+│       ├── appointments.py   # Управление записями к врачу
+│       ├── prescriptions.py  # Управление рецептами
+│       ├── medical_records.py # Управление медицинскими записями
+│       ├── files.py          # Загрузка/скачивание файлов
+│       └── admin.py          # Админ-панель
+├── uploads/                  # Загруженные медицинские документы
 ├── requirements.txt
 ├── .gitignore
 └── README.md
 ```
 
-## 📝 License
+---
 
-This project is for **educational purposes only**. Use responsibly.
+## 🗃️ Модели данных
+
+| Модель | Описание | Ключевые поля |
+|--------|----------|---------------|
+| **User** | Пользователь системы | `id`, `email`, `name`, `role`, `api_key` |
+| **PatientProfile** | Профиль пациента | `user_id`, `blood_type`, `allergies`, `insurance_number` |
+| **Appointment** | Запись к врачу | `patient_id`, `doctor_id`, `date`, `status`, `diagnosis` |
+| **Prescription** | Рецепт (UUID ID) | `patient_id`, `doctor_id`, `medication`, `dosage`, `status` |
+| **MedicalRecord** | Медицинская запись | `patient_id`, `doctor_id`, `record_type`, `result` |
+| **File** | Загруженный файл | `owner_id`, `filename`, `file_path`, `file_type` |
+
+### Роли и права
+
+| Роль | Описание | 
+|------|----------|
+| `patient` | Просмотр своих данных, запись к врачу |
+| `doctor` | Пациенты, рецепты, медзаписи |
+| `nurse` | Просмотр данных пациентов, помощь с записями |
+| `receptionist` | Управление записями к врачу |
+| `admin` | Полный доступ к системе |
+
+---
+
+## 🧪 Примеры эксплуатации
+
+### 1. Горизонтальный IDOR (I1)
+
+```bash
+# Логин как пациент John (user_id=1)
+TOKEN=$(curl -s -X POST http://localhost:8000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"john@patient.com","password":"patient123"}' | jq -r .access_token)
+
+# Просмотр ЧУЖОГО профиля (Jane, patient_id=2)
+curl http://localhost:8000/api/patients/2 \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+### 2. Mass Assignment — регистрация как admin (B9)
+
+```bash
+curl -X POST http://localhost:8000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"hacker@evil.com","name":"Hacker","password":"hack123","role":"admin"}'
+```
+
+### 3. Forced Browsing — админ без авторизации (B3)
+
+```bash
+# Доступ к списку ВСЕХ пользователей без логина
+curl http://localhost:8000/api/admin/users
+```
+
+### 4. IDOR файлов (I7)
+
+```bash
+# Скачивание чужого медицинского документа
+curl http://localhost:8000/api/files/1/download \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+---
+
+## 📝 Лицензия
+
+Проект предназначен **исключительно для образовательных целей**. Используйте ответственно.
